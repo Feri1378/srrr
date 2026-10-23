@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>فروشگاه</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#2e9e48; --green-d:#23863b; --lime:#7ed957;
+  --dark:#1f2326; --text:#1c2024; --muted:#8a9099;
+  --bg:#f4f5f7; --card:#fff; --line:#e7e9ed; --chip:#eef0f3;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--bg);color:var(--text);padding-bottom:96px;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:0}
+input{font-family:inherit}
+
+/* header */
+.hd{background:linear-gradient(135deg,#1c2023 0%,#262b2e 60%,#1d3a26 140%);color:#fff;padding:16px 16px 18px;display:flex;align-items:center;gap:12px}
+.logo{width:68px;height:68px;border-radius:50%;border:2px solid var(--lime);background:#111;flex:none;overflow:hidden;display:grid;place-items:center;font-size:30px}
+.logo img{width:100%;height:100%;object-fit:cover}
+.hd-t{flex:1;min-width:0}
+.hd-t h1{margin:0;font-size:21px;font-weight:800;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd-t p{margin:2px 0 0;font-size:12px;color:#c3c8ce;line-height:1.6}
+.bot{display:flex;align-items:center;gap:7px;color:#fff;text-decoration:none;font-size:12px;opacity:.95;flex:none}
+.bot svg{width:26px;height:26px}
+
+/* search + chips */
+.wrap{padding:0 14px}
+.search{margin-top:14px;position:relative}
+.search input{width:100%;height:46px;border-radius:23px;border:1px solid var(--line);background:#fff;padding:0 44px 0 16px;font-size:14px;outline:none}
+.search input:focus{border-color:var(--green)}
+.search svg{position:absolute;right:15px;top:13px;width:20px;height:20px;color:#6b7280}
+.chips{display:flex;gap:10px;overflow-x:auto;padding:14px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:7px;height:42px;padding:0 18px;border-radius:21px;background:var(--chip);color:#2a2f35;font-size:14px;font-weight:600;transition:.15s}
+.chip.on{background:var(--green);color:#fff}
+.chip .i{font-size:16px;line-height:1}
+
+/* grid */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pic{position:relative;aspect-ratio:1/0.82;background:#eceef1;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.pic .ph{width:100%;height:100%;display:grid;place-items:center;font-size:44px;color:#b9bec6}
+.badge{position:absolute;top:9px;right:9px;background:rgba(25,32,28,.88);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:14px;display:flex;align-items:center;gap:4px}
+.badge svg{width:13px;height:13px;color:#ff7a2f}
+.oos{position:absolute;inset:0;background:rgba(255,255,255,.72);display:grid;place-items:center;font-weight:800;color:#6b7280}
+.info{padding:10px 11px 12px;display:flex;flex-direction:column;gap:5px;flex:1}
+.nm{font-size:14.5px;font-weight:700;line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ds{font-size:11.5px;color:var(--muted);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pr{font-size:17px;font-weight:800;color:var(--green);margin-top:auto;padding-top:4px}
+.pr small{font-size:13px;font-weight:700}
+.buy{margin-top:6px;width:100%;height:44px;border-radius:10px;background:var(--green);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.buy:active{background:var(--green-d)}
+.buy svg{width:20px;height:20px}
+.buy[disabled]{background:#c9cdd3}
+.step{margin-top:6px;height:44px;border-radius:10px;background:#e8f5ec;display:flex;align-items:center;justify-content:space-between;padding:0 6px}
+.step button{width:36px;height:34px;border-radius:8px;background:var(--green);color:#fff;font-size:20px;font-weight:700;line-height:1}
+.step span{font-weight:800;font-size:16px;color:var(--green-d)}
+
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:50px 0;font-size:14px}
+.sk{height:300px;border-radius:14px;background:linear-gradient(90deg,#eceef1 25%,#f6f7f9 50%,#eceef1 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* cart bar */
+.bar{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;background:var(--dark);color:#fff;border-radius:16px;height:60px;display:none;align-items:center;justify-content:space-between;padding:0 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);width:auto}
+.bar.show{display:flex}
+.bar .l{display:flex;align-items:center;gap:10px;font-weight:700}
+.bar .cnt{background:var(--green);border-radius:50%;min-width:28px;height:28px;display:grid;place-items:center;font-size:13px;padding:0 4px}
+.bar .tot{font-weight:800;font-size:15px}
+
+/* sheet */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:30;opacity:0;pointer-events:none;transition:.2s}
+.ov.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:#fff;border-radius:22px 22px 0 0;max-height:86vh;display:flex;flex-direction:column;transform:translateY(105%);transition:.25s}
+.sheet.show{transform:none}
+.sh-h{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 10px}
+.sh-h h2{margin:0;font-size:17px}
+.x{width:34px;height:34px;border-radius:50%;background:var(--chip);font-size:18px;color:#444}
+.sh-b{overflow:auto;padding:0 18px}
+.it{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.it img,.it .ph{width:60px;height:60px;border-radius:10px;object-fit:cover;background:#eceef1;flex:none;display:grid;place-items:center;font-size:24px;color:#b9bec6}
+.it .m{flex:1;min-width:0}
+.it .m b{display:block;font-size:13.5px;line-height:1.6}
+.it .m span{font-size:13px;color:var(--green);font-weight:700}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:30px;height:30px;border-radius:8px;background:var(--chip);font-size:18px;font-weight:700}
+.qty b{min-width:20px;text-align:center}
+.sh-f{padding:14px 18px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.sum{display:flex;justify-content:space-between;font-weight:800;font-size:16px;margin-bottom:12px}
+.go{width:100%;height:50px;border-radius:12px;background:var(--green);color:#fff;font-weight:800;font-size:16px}
+.go[disabled]{opacity:.6}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.8}
+.dimg{width:100%;aspect-ratio:1/0.8;object-fit:cover;border-radius:14px;background:#eceef1;display:block}
+.dph{display:grid;place-items:center;font-size:60px;color:#b9bec6}
+.dhot{display:inline-flex;align-items:center;gap:4px;margin-top:10px;background:var(--dark);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:14px}
+.dhot svg{width:13px;height:13px;color:#ff7a2f}
+.dpr{font-size:21px;font-weight:800;color:var(--green);margin-top:12px}
+.dpr small{font-size:13px}
+.dmeta{font-size:12.5px;color:var(--muted);margin-top:6px}
+.dtitle{font-weight:800;font-size:15px;margin:18px 0 8px}
+.ddesc{font-size:14px;line-height:2.1;color:#3b4149;white-space:pre-line;background:#f7f8fa;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-90px);background:#222;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;z-index:50;transition:.25s;max-width:90%}
+.toast.show{transform:translateX(-50%)}
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <div class="logo" id="logo">🛍</div>
+  <div class="hd-t">
+    <h1 id="shopName">فروشگاه</h1>
+    <p id="tagline"></p>
+  </div>
+  <a class="bot" id="botLink" href="#">
+    <svg viewBox="0 0 24 24" fill="#fff"><path d="M21.9 3.6 2.6 11c-1.3.5-1.3 1.3-.2 1.6l4.9 1.5 1.9 5.8c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.8L23 5c.3-1.3-.5-1.9-1.1-1.4ZM8.4 13.4l9.9-6.2c.5-.3.9-.1.5.2l-8.2 7.4-.3 3.4-1.9-4.8Z"/></svg>
+    <span>ربات فروشگاه</span>
+  </a>
+</header>
+
+<main class="wrap">
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="جستجوی محصولات..." autocomplete="off">
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+</main>
+
+<div class="bar" id="bar" onclick="openCart()">
+  <div class="l"><span class="cnt" id="bCnt">۰</span><span>مشاهده سبد خرید</span></div>
+  <div class="tot" id="bTot"></div>
+</div>
+
+<div class="ov" id="ov" onclick="closeCart()"></div>
+<div class="sheet" id="sheet">
+  <div class="sh-h"><h2>🛒 سبد خرید</h2><button class="x" onclick="closeCart()">✕</button></div>
+  <div class="sh-b" id="cartList"></div>
+  <div class="sh-f">
+    <div class="sum"><span>مبلغ کل</span><span id="cTot"></span></div>
+    <button class="go" id="go" onclick="checkout()">ثبت سفارش و پرداخت</button>
+    <div class="note">بعد از ثبت سفارش، فاکتور و شماره کارت داخل ربات برات ارسال می‌شه.</div>
+  </div>
+</div>
+<div class="ov" id="dov" onclick="closeDetail()"></div>
+<div class="sheet" id="dsheet">
+  <div class="sh-h"><h2 id="dTitle"></h2><button class="x" onclick="closeDetail()">✕</button></div>
+  <div class="sh-b" id="dBody"></div>
+  <div class="sh-f" id="dAct"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ======= تنظیم: آدرس Web App اپ اسکریپت رو اینجا بذار ======= */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzQgLIT51gZsVaGpmBdjngJMK2HKZ7vw_IKbL2XIeF9j4-FL1oKe6n1hYaZH4Hex8hU5g/exec';
+/* ============================================================ */
+
+const tg = window.Telegram && Telegram.WebApp;
+if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor('#1f2326'); tg.setBackgroundColor('#f4f5f7'); } catch (e) {} }
+
+const $ = id => document.getElementById(id);
+const fa = s => String(s).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const money = n => fa(String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/ي/g, 'ی').replace(/ك/g, 'ک').toLowerCase();
+
+let DATA = { shop: {}, categories: [], products: [] };
+let cat = 'all', query = '';
+let cart = {};
+try { cart = JSON.parse(localStorage.getItem('cart') || '{}'); } catch (e) {}
+const saveCart = () => { try { localStorage.setItem('cart', JSON.stringify(cart)); } catch (e) {} };
+
+const ICON_FIRE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 1s1 3.2-1 5.6C10.7 8.4 8 9.8 8 13a4 4 0 0 0 8 0c0-1-.3-1.8-.8-2.6 2.6 1.3 4.3 3.8 4.3 6.6A7.5 7.5 0 0 1 12 24a7.5 7.5 0 0 1-7.5-7.5C4.5 9 11 7 13.5 1Z"/></svg>';
+const ICON_CART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 7H6"/></svg>';
+
+function toast(t) {
+  const el = $('toast'); el.textContent = t; el.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+async function load() {
+  try {
+    const cached = sessionStorage.getItem('shop');
+    if (cached) { DATA = JSON.parse(cached); paint(); }
+  } catch (e) {}
+  try {
+    const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'shop' }) });
+    const j = await r.json();
+    if (j.ok) { DATA = j.data; try { sessionStorage.setItem('shop', JSON.stringify(DATA)); } catch (e) {} }
+  } catch (e) {
+    if (!DATA.products.length) { $('grid').innerHTML = '<div class="empty">خطا در دریافت محصولات.<br>اینترنت رو چک کن و دوباره امتحان کن.</div>'; return; }
+  }
+  // پاک کردن آیتم‌هایی از سبد که دیگر وجود ندارند
+  Object.keys(cart).forEach(id => { if (!DATA.products.some(p => p.id === id)) delete cart[id]; });
+  saveCart();
+  paint();
+}
+
+function paint() {
+  const s = DATA.shop || {};
+  $('shopName').textContent = s.name || 'فروشگاه';
+  document.title = s.name || 'فروشگاه';
+  $('tagline').textContent = s.tagline || '';
+  if (s.logo) $('logo').innerHTML = '<img src="' + esc(s.logo) + '" alt="">';
+  const bl = $('botLink');
+  if (s.bot) { bl.href = 'https://t.me/' + s.bot; bl.onclick = e => { if (tg) { e.preventDefault(); tg.openTelegramLink('https://t.me/' + s.bot); } }; }
+  else bl.style.display = 'none';
+  drawChips(); drawGrid(); drawBar();
+}
+
+function drawChips() {
+  let h = '<button class="chip ' + (cat === 'all' ? 'on' : '') + '" data-c="all"><span class="i">▦</span>همه</button>';
+  (DATA.categories || []).forEach(c => {
+    h += '<button class="chip ' + (cat === c.name ? 'on' : '') + '" data-c="' + esc(c.name) + '"><span class="i">' + esc(c.icon || '') + '</span>' + esc(c.name) + '</button>';
+  });
+  $('chips').innerHTML = h;
+}
+$('chips').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  cat = b.dataset.c; drawChips(); drawGrid();
+});
+$('q').addEventListener('input', e => { query = norm(e.target.value.trim()); drawGrid(); });
+
+function actionHtml(p) {
+  if (p.stock <= 0) return '<button class="buy" disabled>ناموجود</button>';
+  const q = cart[p.id] || 0;
+  if (!q) return '<button class="buy" data-a="add" data-id="' + esc(p.id) + '">خرید محصول ' + ICON_CART + '</button>';
+  return '<div class="step"><button data-a="inc" data-id="' + esc(p.id) + '">+</button><span>' + fa(q) + '</span><button data-a="dec" data-id="' + esc(p.id) + '">−</button></div>';
+}
+
+function drawGrid() {
+  const list = (DATA.products || []).filter(p =>
+    (cat === 'all' || p.category === cat) &&
+    (!query || norm(p.name + ' ' + (p.desc || '')).indexOf(query) > -1));
+  if (!list.length) { $('grid').innerHTML = '<div class="empty">محصولی پیدا نشد 🔍</div>'; return; }
+  $('grid').innerHTML = list.map(p => {
+    const img = p.image ? '<img loading="lazy" src="' + esc(p.image) + '" alt="">' : '<div class="ph">🛍</div>';
+    return '<div class="card" id="c-' + esc(p.id) + '"><div class="pic">' + img +
+      (p.badge ? '<span class="badge">پرفروش ' + ICON_FIRE + '</span>' : '') +
+      (p.stock <= 0 ? '<div class="oos">ناموجود</div>' : '') + '</div>' +
+      '<div class="info"><div class="nm">' + esc(p.name) + '</div>' +
+      (p.desc ? '<div class="ds">' + esc(p.desc) + '</div>' : '') +
+      '<div class="pr">' + money(p.price) + ' <small>تومان</small></div>' +
+      '<div class="act">' + actionHtml(p) + '</div></div></div>';
+  }).join('');
+}
+
+function refreshCard(id) {
+  const p = DATA.products.find(x => x.id === id), el = document.querySelector('#c-' + CSS.escape(id) + ' .act');
+  if (p && el) el.innerHTML = actionHtml(p);
+}
+
+function setQty(id, q) {
+  const p = DATA.products.find(x => x.id === id); if (!p) return;
+  q = Math.max(0, Math.min(q, p.stock, 99));
+  if (q === (cart[id] || 0) && q === p.stock && q > 0) toast('بیشتر از موجودی انبار نمی‌شه');
+  if (q) cart[id] = q; else delete cart[id];
+  saveCart(); refreshCard(id); drawBar();
+  if ($('sheet').classList.contains('show')) drawCart();
+  if (detailId === id) drawDetailAct();
+  if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+}
+
+$('grid').addEventListener('click', e => {
+  const b = e.target.closest('button[data-a]');
+  if (!b) { const c = e.target.closest('.card'); if (c && c.id) openDetail(c.id.slice(2)); return; }
+  const id = b.dataset.id, q = cart[id] || 0;
+  setQty(id, b.dataset.a === 'dec' ? q - 1 : q + 1);
+});
+
+function totals() {
+  let n = 0, t = 0;
+  Object.keys(cart).forEach(id => { const p = DATA.products.find(x => x.id === id); if (p) { n += cart[id]; t += cart[id] * p.price; } });
+  return { n, t };
+}
+function drawBar() {
+  const { n, t } = totals();
+  $('bar').classList.toggle('show', n > 0);
+  $('bCnt').textContent = fa(n);
+  $('bTot').textContent = money(t) + ' تومان';
+}
+
+function drawCart() {
+  const ids = Object.keys(cart).filter(id => DATA.products.some(p => p.id === id));
+  if (!ids.length) { $('cartList').innerHTML = '<div class="empty" style="padding:40px 0">سبد خرید خالیه</div>'; $('cTot').textContent = '۰'; $('go').disabled = true; return; }
+  $('go').disabled = false;
+  $('cartList').innerHTML = ids.map(id => {
+    const p = DATA.products.find(x => x.id === id);
+    return '<div class="it">' + (p.image ? '<img src="' + esc(p.image) + '" alt="">' : '<div class="ph">🛍</div>') +
+      '<div class="m"><b>' + esc(p.name) + '</b><span>' + money(p.price * cart[id]) + ' تومان</span></div>' +
+      '<div class="qty"><button data-a="inc" data-id="' + esc(id) + '">+</button><b>' + fa(cart[id]) + '</b><button data-a="dec" data-id="' + esc(id) + '">−</button></div></div>';
+  }).join('');
+  $('cTot').textContent = money(totals().t) + ' تومان';
+}
+$('cartList').addEventListener('click', e => {
+  const b = e.target.closest('button[data-a]'); if (!b) return;
+  const id = b.dataset.id, q = cart[id] || 0;
+  setQty(id, b.dataset.a === 'dec' ? q - 1 : q + 1);
+  if (!Object.keys(cart).length) closeCart();
+});
+
+/* ======= صفحه جزئیات محصول (با توضیحات کامل) ======= */
+let detailId = null;
+function openDetail(id) {
+  const p = DATA.products.find(x => x.id === id); if (!p) return;
+  detailId = id;
+  $('dTitle').textContent = p.name;
+  $('dBody').innerHTML =
+    (p.image ? '<img class="dimg" src="' + esc(p.image) + '" alt="">' : '<div class="dimg dph">🛍</div>') +
+    (p.badge ? '<div class="dhot">پرفروش ' + ICON_FIRE + '</div>' : '') +
+    '<div class="dpr">' + money(p.price) + ' <small>تومان</small></div>' +
+    '<div class="dmeta">' + (p.category ? 'دسته: ' + esc(p.category) + ' · ' : '') + (p.stock > 0 ? 'موجودی: ' + fa(p.stock) : 'ناموجود') + '</div>' +
+    '<div class="dtitle">توضیحات محصول</div>' +
+    '<div class="ddesc">' + (p.desc ? esc(p.desc) : 'برای این محصول توضیحی ثبت نشده.') + '</div>';
+  drawDetailAct();
+  $('dov').classList.add('show'); $('dsheet').classList.add('show');
+}
+function drawDetailAct() {
+  const p = DATA.products.find(x => x.id === detailId); if (!p) return;
+  $('dAct').innerHTML = actionHtml(p);
+}
+function closeDetail() {
+  detailId = null;
+  $('dov').classList.remove('show'); $('dsheet').classList.remove('show');
+}
+$('dAct').addEventListener('click', e => {
+  const b = e.target.closest('button[data-a]'); if (!b) return;
+  const id = b.dataset.id, q = cart[id] || 0;
+  setQty(id, b.dataset.a === 'dec' ? q - 1 : q + 1);
+});
+
+function openCart() { drawCart(); $('ov').classList.add('show'); $('sheet').classList.add('show'); }
+function closeCart() { $('ov').classList.remove('show'); $('sheet').classList.remove('show'); }
+
+async function checkout() {
+  const items = Object.keys(cart).map(id => ({ id: id, qty: cart[id] }));
+  if (!items.length) return;
+  if (!tg || !tg.initData) { toast('لطفاً فروشگاه رو از داخل ربات تلگرام باز کن'); return; }
+  const btn = $('go'); btn.disabled = true; btn.textContent = 'در حال ثبت سفارش...';
+  try {
+    const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'createOrder', initData: tg.initData, items: items }) });
+    const j = await r.json();
+    if (j.ok) {
+      cart = {}; saveCart();
+      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      tg.close();
+      return;
+    }
+    if (j.error === 'stock') toast('موجودی «' + j.name + '» کافی نیست');
+    else if (j.error === 'auth') toast('خطای احراز هویت؛ دوباره از ربات وارد شو');
+    else toast('ثبت سفارش انجام نشد، دوباره تلاش کن');
+  } catch (e) {
+    toast('خطای ارتباط با سرور');
+  }
+  btn.disabled = false; btn.textContent = 'ثبت سفارش و پرداخت';
+}
+
+load();
+</script>
+</body>
+</html>
